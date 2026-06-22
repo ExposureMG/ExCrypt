@@ -61,5 +61,5 @@ target_include_directories(ExCrypt
 if(WIN32)
     target_link_libraries(ExCrypt PRIVATE bcrypt)
 else()
-    target_compile_options(ExCrypt PRIVATE -maes -msse4.1)
+    target_compile_options(ExCrypt PRIVATE -maes -msse4.1 -Wno-implicit-function-declaration)
 endif()
