@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
-project(ExCrypt CXX)
+project(ExCrypt CXX C)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(EXCRYPT_SOURCES
@@ -47,7 +46,7 @@ set(EXCRYPT_HEADERS
     "include/rijndael.h"
 )
 
-add_library(ExCrypt STATIC 
+add_library(ExCrypt STATIC
     ${EXCRYPT_SOURCES}
     ${EXCRYPT_HEADERS}
 )
@@ -61,4 +60,6 @@ target_include_directories(ExCrypt
 
 if(WIN32)
     target_link_libraries(ExCrypt PRIVATE bcrypt)
+else()
+    target_compile_options(ExCrypt PRIVATE -maes -msse4.1 -Wno-implicit-function-declaration)
 endif()
