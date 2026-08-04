@@ -23,6 +23,7 @@ set(EXCRYPT_SOURCES
     "src/excrypt_rotsum.c"
     "src/excrypt_sha.c"
     "src/excrypt_sha2.c"
+    "src/excrypt_uid_ecc.cpp"
     "src/exkeys.cpp"
     "src/rijndael.c"
 )
@@ -60,6 +61,12 @@ target_include_directories(ExCrypt
 
 if(WIN32)
     target_link_libraries(ExCrypt PRIVATE bcrypt)
-else()
-    target_compile_options(ExCrypt PRIVATE -maes -msse4.1 -Wno-implicit-function-declaration)
+endif()
+
+if(NOT MSVC)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86_64|amd64|AMD64|i[3-6]86|x86)")
+        target_compile_options(ExCrypt PRIVATE -maes -msse4.1)
+    endif()
+
+    target_compile_options(ExCrypt PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wno-implicit-function-declaration>)
 endif()
