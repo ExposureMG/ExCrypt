@@ -20,7 +20,9 @@ extern "C" {
 #define _byteswap_uint64 __builtin_bswap64
 #endif
 
+#ifndef BOOL
 typedef int BOOL;
+#endif
 
 #include "excrypt_aes.h"
 #include "excrypt_bn.h"
