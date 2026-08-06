@@ -22,6 +22,7 @@ extern "C" {
 
 #ifndef BOOL
 typedef int BOOL;
+#define BOOL BOOL
 #endif
 
 #include "excrypt_aes.h"
