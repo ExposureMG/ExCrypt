@@ -3,30 +3,33 @@
 #include <cstdint>
 #include <span>
 
+// This file is entirely based on work by Mate Kukri
+// He therefor retains all rights
+
 namespace {
 
-// Galois Field GF(2^7) multiplication modulo reduction polynomial x^7 + x + 1 (0x83)
-[[nodiscard]] constexpr uint8_t gf_mul(uint8_t a, uint8_t b) noexcept {
-    a &= 0x7F;
-    b &= 0x7F;
-    uint32_t p = 0;
-    for (int i = 0; i < 7; ++i) {
-        if ((b >> i) & 1) {
-            p ^= static_cast<uint32_t>(a) << i;
+    // Galois Field GF(2^7) multiplication modulo reduction polynomial x^7 + x + 1 (0x83)
+    [[nodiscard]] constexpr uint8_t gf_mul(uint8_t a, uint8_t b) noexcept {
+        a &= 0x7F;
+        b &= 0x7F;
+        uint32_t p = 0;
+        for (int i = 0; i < 7; ++i) {
+            if ((b >> i) & 1) {
+                p ^= static_cast<uint32_t>(a) << i;
+            }
         }
-    }
-    for (int i = 12; i >= 7; --i) {
-        if ((p >> i) & 1) {
-            p ^= 0x83u << (i - 7);
+        for (int i = 12; i >= 7; --i) {
+            if ((p >> i) & 1) {
+                p ^= 0x83u << (i - 7);
+            }
         }
+        return static_cast<uint8_t>(p);
     }
-    return static_cast<uint8_t>(p);
-}
 
-constexpr uint32_t ECC_LFSR_POLY = 0x360325u;
-constexpr uint8_t ALPHA_POS1 = 0x02;
-constexpr uint8_t ALPHA_NEG1 = 0x41;
-constexpr uint8_t ALPHA_NEG2 = 0x61;
+    constexpr uint32_t ECC_LFSR_POLY = 0x360325u;
+    constexpr uint8_t ALPHA_POS1 = 0x02;
+    constexpr uint8_t ALPHA_NEG1 = 0x41;
+    constexpr uint8_t ALPHA_NEG2 = 0x61;
 
 } // namespace
 
@@ -53,7 +56,8 @@ void XeCryptUidEccEncode(uint8_t cpu_key[16]) {
     for (int k = 106; k < 127; ++k) {
         const uint8_t ecc_bit = ecc_state & 1;
         overall_parity ^= ecc_bit;
-        cpu_key[k / 8] = static_cast<uint8_t>((cpu_key[k / 8] & ~(1 << (k % 8))) | (ecc_bit << (k % 8)));
+        cpu_key[k / 8] =
+            static_cast<uint8_t>((cpu_key[k / 8] & ~(1 << (k % 8))) | (ecc_bit << (k % 8)));
         ecc_state >>= 1;
     }
 
@@ -82,9 +86,9 @@ int XeCryptUidEccDecode(uint8_t cpu_key[16]) {
         return 0;
     }
 
-    const uint8_t s1_sq = gf_mul(s1, s1);          // S1^2
-    const uint8_t t1 = gf_mul(s1, s1_sq) ^ s3;     // S1^3 + S3
-    const uint8_t t2 = gf_mul(s3, s1_sq) ^ s5;     // S3*S1^2 + S5
+    const uint8_t s1_sq = gf_mul(s1, s1);      // S1^2
+    const uint8_t t1 = gf_mul(s1, s1_sq) ^ s3; // S1^3 + S3
+    const uint8_t t2 = gf_mul(s3, s1_sq) ^ s5; // S3*S1^2 + S5
 
     if (t1 == 0 && t2 != 0) {
         return -1;
