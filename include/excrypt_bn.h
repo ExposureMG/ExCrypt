@@ -68,10 +68,24 @@ typedef struct _EXCRYPT_RSAPRV_1024 {
     uint64_t priv_exponent[16];
 } EXCRYPT_RSAPRV_1024;
 
+typedef struct _EXCRYPT_RSAPRV_2048 {
+    EXCRYPT_RSA rsa;
+    uint64_t modulus[32];
+    uint64_t prime1[16];
+    uint64_t prime2[16];
+    uint64_t exponent1[16];
+    uint64_t exponent2[16];
+    uint64_t coefficient[16];
+} EXCRYPT_RSAPRV_2048;
+#ifdef __cplusplus
+static_assert(sizeof(EXCRYPT_RSAPRV_2048) == 0x390, "sizeof(EXCRYPT_RSAPRV_2048) != 0x390");
+#endif
+
 // excrypt_bn_sig.c
 void ExCryptBnQwBeSigFormat(EXCRYPT_SIG* sig, const uint8_t* hash, const uint8_t* salt);
-// BOOL ExCryptBnQwBeSigCreate(EXCRYPT_SIG* sig, const uint8_t* hash, const uint8_t* salt, const
-// EXCRYPT_RSA* privkey);
+BOOL ExCryptBnQwBeRsaPrvValidate(const EXCRYPT_RSA* privkey);
+BOOL ExCryptBnQwBeSigCreate(EXCRYPT_SIG* sig, const uint8_t* hash, const uint8_t* salt,
+                            const EXCRYPT_RSA* privkey);
 BOOL ExCryptBnQwBeSigVerify(EXCRYPT_SIG* sig, const uint8_t* hash, const uint8_t* salt,
                             const EXCRYPT_RSA* pubkey);
 int32_t ExCryptBnQwBeSigDifference(EXCRYPT_SIG* sig, const uint8_t* hash, const uint8_t* salt,
